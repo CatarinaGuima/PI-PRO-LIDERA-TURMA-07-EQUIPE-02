@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import "@fontsource-variable/figtree";
+import "@fontsource-variable/bricolage-grotesque";
 import "./globals.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { Toaster } from "@/components/ui/toaster";
 import { UserProvider } from "../../contexts/user-context";
-
-
-const balooFont = localFont({
-  src: "./fonts/BalooPaaji2-VariableFont_wght.ttf",
-  variable: "--font-baloo",
-  weight: "100 900",
-});
 
 export const metadata: Metadata = {
   title: "PRO Lidera Skills",
@@ -25,8 +19,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${balooFont.variable}  antialiased h-auto`}>
+    <html lang="pt-BR" suppressHydrationWarning>
+      <body className="antialiased">
         <UserProvider>
           <Header />
           {children}

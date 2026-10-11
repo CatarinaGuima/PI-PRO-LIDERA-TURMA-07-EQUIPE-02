@@ -1,4 +1,6 @@
 import { cloneElement, ReactElement } from "react";
+import { CustomButton } from "@/components/button/custom-button";
+
 interface ConfirmDialogProps {
   isOpen: boolean;
   onClose: () => void;
@@ -15,36 +17,40 @@ export const ConfirmDialog = ({
   onClose,
   onConfirm,
   icon,
+  title,
   message,
   confirmButtonLabel,
 }: ConfirmDialogProps) => {
-
-  const iconStyle = `fill-current w-10 h-10`;
-
   if (!isOpen) return null;
 
   return (
     <div
-      className="fixed inset-0 bg-[#2D3134] bg-opacity-25 backdrop-blur-sm flex justify-center items-center"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/50 p-4 backdrop-blur-sm"
       aria-modal="true"
       role="dialog"
+      aria-labelledby="confirm-dialog-title"
+      aria-describedby="confirm-dialog-message"
     >
-      <div className="w-72 h-80 bg-gray-100 rounded-xl flex flex-col items-center justify-between px-4 py-1 shadow-lg">
-        <div className="flex flex-col items-center gap-2 w-3/4 p-4">
-          {cloneElement(icon, { className: iconStyle })}
-          <p className="font-medium text-[#2D3134] text-xl text-center">{message}</p>
+      <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-lift">
+        <div className="mb-4 grid h-12 w-12 place-items-center rounded-full bg-[#FBEFC9] text-[#8A5A00]">
+          {cloneElement(icon, { className: "h-6 w-6" })}
         </div>
-        <div className="flex w-full justify-evenly">
-          <button onClick={onClose} className="font-semibold text-gray-700 text-xl p-2">
+        <h2
+          id="confirm-dialog-title"
+          className="font-display text-xl font-bold text-ink"
+        >
+          {title}
+        </h2>
+        <p id="confirm-dialog-message" className="mt-2 text-ink-soft">
+          {message}
+        </p>
+        <div className="mt-6 flex justify-end gap-3">
+          <CustomButton type="button" variant="outline" onClick={onClose}>
             Voltar
-          </button>
-          <div className="h-3/4 bg-white w-0.5 self-center" />
-          <button
-            onClick={onConfirm}
-            className={`font-semibold text-secundary text-xl p-2`}
-          >
+          </CustomButton>
+          <CustomButton type="button" onClick={onConfirm}>
             {confirmButtonLabel}
-          </button>
+          </CustomButton>
         </div>
       </div>
     </div>

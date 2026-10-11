@@ -1,7 +1,8 @@
 "use client";
-import { GoDotFill } from "react-icons/go";
+import { Check } from "lucide-react";
+import Image from "next/image";
+import illustration from "@/assets/images/rb_76463.png";
 import { CustomButton } from "@/components/button/custom-button";
-import Link from "next/link";
 import { Title } from "@/components/title";
 import { Vortex } from "react-loader-spinner";
 import { useState } from "react";
@@ -21,10 +22,10 @@ export default function Instrucoes() {
   
 
   return (
-    <div className="flex justify-center items-center h-full py-24 min-h-screen">
+    <main className="mx-auto flex min-h-screen max-w-[1100px] items-center px-4 pb-16 pt-28 sm:px-6">
       {isLoading ? (
-        <div className="bg-[#f9f9f9] p-6 rounded-lg shadow-md w-full h-full max-w-4xl">
-          <div className="flex flex-col justify-center items-center text-center text-lg font-semibold">
+        <div className="w-full rounded-2xl border border-line bg-white p-8">
+          <div className="flex flex-col items-center justify-center gap-2 text-center text-lg font-semibold">
             Carregando o questionário... Aguarde.
             <div>
               <Vortex
@@ -34,60 +35,71 @@ export default function Instrucoes() {
                 ariaLabel="vortex-loading"
                 wrapperStyle={{}}
                 wrapperClass="vortex-wrapper"
-                colors={["green", "blue", "purple", "green", "blue", "purple"]}
+                colors={["#88C16C", "#2A7E9E", "#7C55C7", "#88C16C", "#2A7E9E", "#7C55C7"]}
               />
             </div>
           </div>
         </div>
       ) : (
-        <div className="p-4 sm:p-8 md:p-16 lg:p-24 text-justify max-w-4xl mx-auto">
-          <div className="mb-6">
+        <div className="grid w-full items-center gap-12 lg:grid-cols-[1.2fr_0.8fr]">
+          <div>
             <Title />
-            <p className="font-semibold text-lg sm:text-xl">
+            <p className="mt-3 text-xl text-ink-soft">
               Olá
-              <span className="text-primary font-semibold ml-2">{user?.name}</span>,
+              {user?.name && (
+                <>
+                  , <span className="font-semibold text-primary">{user.name}</span>
+                </>
+              )}
+              .
             </p>
-          </div>
-          <span className="font-bold text-lg sm:text-xl">Instruções!</span>
-          <p className="text-base sm:text-lg md:text-xl mt-6 sm:mt-8 mb-6">
-            &nbsp;&nbsp;&nbsp;&nbsp;O teste contém 18 perguntas, após respondê-lo,
-            você receberá um dos três resultados possíveis: “Liderança Frágil e
-            pouco trabalhada”, “Liderança em Desenvolvimento” ou “Liderança de alta
-            performance”, juntamente com uma análise do seu desempenho. Responda a
-            todas as perguntas com honestidade, pois a precisão dos resultados
-            depende da exatidão de suas respostas. O tempo não é uma restrição, e
-            não existem respostas certas ou erradas.
-          </p>
-          <p className="text-base sm:text-lg md:text-xl mb-6">
-            Você está prestes a inicializar o teste de liderança da PRO Lidera
-            Skills. Esta é uma página de acompanhamento da sua avaliação. Aqui vão
-            algumas dicas:
-          </p>
-          <div className="text-base sm:text-lg md:text-xl space-y-4">
-            {[
-              "Verifique a sua conexão com a internet antes de iniciar.",
-              "Fique atento(a): caso você saia do teste após iniciado, ao retornar, ele estará na página em que parou.",
-              "Busque um lugar calmo e livre de perturbações.",
-              "Faça os testes, preferencialmente, pelo computador.",
-              "Caso alguma página, imagem ou texto não carregue, clique no botão \"Atualizar\" do seu navegador para carregá-la novamente.",
-            ].map((dica, index) => (
-              <div key={index} className="flex gap-2 items-center">
-                <div className="flex items-center justify-center w-5 h-5">
-                  <GoDotFill fontSize={20} />
-                </div>
-                <p>{dica}</p>
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-center items-center mt-16">
-            <Link href="/questionario">
-              <CustomButton className="text-white" onClick={handleStartTest}>
-                Iniciar Teste
+
+            <p className="mt-6 max-w-[62ch] text-lg leading-relaxed text-ink-soft">
+              O teste tem 18 perguntas. Ao responder todas, você recebe um de
+              três resultados, com uma análise do seu desempenho: liderança
+              frágil e pouco trabalhada, liderança em desenvolvimento ou líder
+              de alta performance. Responda com honestidade: a precisão do
+              resultado depende das suas respostas. Não há limite de tempo nem
+              respostas certas ou erradas.
+            </p>
+
+            <h2 className="mt-10 text-xl font-bold">Antes de começar</h2>
+            <ul className="mt-4 flex max-w-[62ch] flex-col gap-3">
+              {[
+                "Verifique a sua conexão com a internet antes de iniciar.",
+                "Se você sair do teste, ao voltar ele estará na página em que parou.",
+                "Busque um lugar calmo e livre de perturbações.",
+                "Faça o teste, preferencialmente, pelo computador.",
+                "Se alguma página, imagem ou texto não carregar, atualize o navegador para carregá-la de novo.",
+              ].map((dica) => (
+                <li key={dica} className="flex items-start gap-3">
+                  <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-leaf/30 text-leaf-700">
+                    <Check className="h-4 w-4" aria-hidden />
+                  </span>
+                  <span className="text-ink-soft">{dica}</span>
+                </li>
+              ))}
+            </ul>
+
+            <div className="mt-10">
+              <CustomButton
+                href="/questionario"
+                className="px-8 py-3 text-base"
+                onClick={handleStartTest}
+              >
+                Iniciar teste
               </CustomButton>
-            </Link>
+            </div>
           </div>
+
+          <Image
+            src={illustration}
+            alt=""
+            className="mx-auto hidden h-auto w-full max-w-md lg:block"
+            priority
+          />
         </div>
       )}
-    </div>
+    </main>
   );
 }
