@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { CustomButton } from "@/components/button/custom-button";
 import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
-import { FaFacebook } from "react-icons/fa";
 import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -164,12 +163,6 @@ export default function Login() {
                 onClick={handleLoginGoogle}
               >
                 <FcGoogle /> Google
-              </CustomButton>
-              <CustomButton
-                className="w-full flex items-center justify-center gap-x-3 shadow-lg bg-opacity-60"
-                onClick={() => console.log("Login com Facebook")}
-              >
-                <FaFacebook className="text-[#1d2c4c]" /> Facebook
               </CustomButton>
 
               {/* Cadastro */}

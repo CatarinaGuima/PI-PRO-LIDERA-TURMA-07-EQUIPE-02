@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FcGoogle } from "react-icons/fc";
-import { FaFacebook } from "react-icons/fa";
 import { FormEvent } from "react";
 import Image from "next/image";
 import image from "@/assets/images/sign.jpg";
@@ -68,13 +67,6 @@ const [error, setError] = useState('');
               >
                 <FcGoogle />
                 Google
-              </CustomButton>
-              <CustomButton
-                className="w-80 flex items-center justify-center gap-x-3 shadow-lg bg-opacity-60"
-                onClick={() => {}}
-              >
-                <FaFacebook className="text-[#1d2c4c]" />
-                Facebook
               </CustomButton>
             </div>
 
