@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import logo from "../../../src/assets/images/logo.png";
-import { RxHamburgerMenu } from "react-icons/rx";
+import { RxHamburgerMenu, RxCross2 } from "react-icons/rx";
 import { Switch } from "../ui/switch";
 import { TbAccessible } from "react-icons/tb";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
@@ -10,57 +10,58 @@ import { DropdownMenuDemo } from "../menu";
 import { useSession } from "../../../contexts/user-context";
 import Link from "next/link";
 
+const navLink =
+  "rounded-lg px-3 py-2 text-[0.95rem] font-medium text-ink-soft transition-colors hover:bg-primary/10 hover:text-primary";
+
 export function Header() {
   const [isActive, setIsActive] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, avatarUrl } = useSession();
 
+  const closeMenu = () => setIsMenuOpen(false);
+
   return (
-    <header className="w-full fixed top-0 bg-[var(--background-color)] shadow-md z-20">
-      <nav className="flex items-center justify-between h-16 max-w-[1240px] mx-auto px-4">
-        <div className="flex items-center text-[#4d4d4d]">
+    <header className="fixed top-0 z-20 w-full border-b border-line bg-white/85 backdrop-blur-md">
+      <nav
+        aria-label="Principal"
+        className="mx-auto flex h-16 max-w-[1240px] items-center justify-between px-4 sm:px-6"
+      >
+        <Link href="/" className="flex items-center gap-2.5" onClick={closeMenu}>
           <Image
-            className="w-[8vh] h-[8vh] max-sm:w-[5vh] max-sm:h-[5vh]"
+            className="h-10 w-10 max-sm:h-9 max-sm:w-9"
             src={logo}
-            alt="logo"
+            alt=""
+            priority
           />
-          <h1 className="text-[var(--primary-color)] text-lg font-bold max-sm:text-sm ml-2">
+          <span className="font-display text-lg font-bold tracking-tight text-ink max-sm:text-base">
             PRO Lidera Skills
-          </h1>
-        </div>
+          </span>
+        </Link>
+
         <ul
-          className={`flex items-center list-none gap-8 max-sm:flex-col max-sm:absolute max-sm:bg-[var(--background-color)] max-sm:w-full max-sm:top-16 max-sm:left-0 max-sm:z-10 max-sm:shadow-md transition-all duration-300 ${
-            isMenuOpen ? "block" : "hidden"
-          } sm:flex`}
+          className={`list-none items-center gap-1 max-sm:absolute max-sm:left-0 max-sm:top-16 max-sm:w-full max-sm:flex-col max-sm:items-stretch max-sm:gap-1 max-sm:border-b max-sm:border-line max-sm:bg-white max-sm:p-4 max-sm:shadow-lift sm:flex ${
+            isMenuOpen ? "flex" : "hidden"
+          }`}
         >
           <li>
-            <Link
-              href="/"
-              className="text-[var(--text-color)] hover:text-primary text-base transition-colors duration-200 ease-in-out"
-            >
+            <Link href="/" className={`block ${navLink}`} onClick={closeMenu}>
               Home
             </Link>
           </li>
           <li>
-            <a
-              href="#about-us"
-              className="text-[var(--text-color)] hover:text-primary text-base transition-colors duration-200 ease-in-out"
-            >
+            <a href="#about-us" className={`block ${navLink}`} onClick={closeMenu}>
               Quem somos
             </a>
           </li>
           <li>
-            <a
-              href="#footer"
-              className="text-[var(--text-color)] hover:text-primary text-base transition-colors duration-200 ease-in-out"
-            >
+            <a href="#footer" className={`block ${navLink}`} onClick={closeMenu}>
               Contato
             </a>
           </li>
 
           {user && (
             <>
-              <li>
+              <li className="flex items-center gap-3 max-sm:px-3 max-sm:py-2 sm:ml-2">
                 <Avatar>
                   <AvatarImage src={avatarUrl || ""} />
                   <AvatarFallback>
@@ -70,29 +71,36 @@ export function Header() {
                       .join("")}
                   </AvatarFallback>
                 </Avatar>
+                <DropdownMenuDemo />
               </li>
-              <DropdownMenuDemo />
             </>
           )}
 
-          <li className="flex items-center gap-1">
+          <li className="flex items-center gap-2 max-sm:px-3 max-sm:py-2 sm:ml-3 sm:border-l sm:border-line sm:pl-4">
             <Switch
-              id="airplane-mode"
+              id="accessibility-mode"
+              aria-label="Acessibilidade"
               onClick={() => setIsActive(!isActive)}
-              className={`peer inline-flex ${
-                isActive ? "bg-primary" : "bg-textColor border-textColor"
-              }`}
             />
-            <span className="font-bold">Acessibilidade</span>
-            <TbAccessible />
+            <label
+              htmlFor="accessibility-mode"
+              className="flex cursor-pointer items-center gap-1 text-sm font-semibold text-ink-soft"
+            >
+              Acessibilidade
+              <TbAccessible aria-hidden className="text-lg" />
+            </label>
           </li>
         </ul>
-        <aside className="sm:hidden">
-          <RxHamburgerMenu
-            className="cursor-pointer text-2xl"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-          />
-        </aside>
+
+        <button
+          type="button"
+          className="rounded-lg p-2 text-2xl text-ink hover:bg-primary/10 sm:hidden"
+          aria-label={isMenuOpen ? "Fechar menu" : "Abrir menu"}
+          aria-expanded={isMenuOpen}
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+        >
+          {isMenuOpen ? <RxCross2 /> : <RxHamburgerMenu />}
+        </button>
       </nav>
     </header>
   );

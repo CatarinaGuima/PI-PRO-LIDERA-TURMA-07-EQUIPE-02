@@ -1,13 +1,11 @@
 "use client";
 import { CustomButton } from "@/components/button/custom-button";
-import image from "@/assets/images/img.result.png";
+import { Ladder, levelIndex } from "@/components/ladder";
 import { Title } from "@/components/title";
-import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { jsPDF } from "jspdf";
 import { Suspense, useCallback, useState } from "react";
 import resultData from "../../lib/resultData.json";
-import React from "react";
 import { useSession } from "../../../contexts/user-context";
 
 export default function ResultadoQuestionario() {
@@ -35,6 +33,23 @@ function ResultadoContent() {
   // Obter a mensagem correspondente
   const resultMessage =
     resultMessages[resultCategoryFromQuery] || "Resultado não encontrado.";
+
+  // Agrupa as frases em parágrafos de até três frases para facilitar a leitura
+  const sentences = resultMessage
+    .split(".")
+    .map((sentence) => sentence.trim())
+    .filter(Boolean);
+  const paragraphs: string[] = [];
+  for (let i = 0; i < sentences.length; i += 3) {
+    paragraphs.push(`${sentences.slice(i, i + 3).join(". ")}.`);
+  }
+
+  const activeLevel = levelIndex(resultCategoryFromQuery);
+  const levelTextColor = [
+    "text-leaf-700",
+    "text-primary",
+    "text-violet-600",
+  ][activeLevel];
 
   // Converter imagem para base64
   const getBase64ImageFromUrl = async (url: string): Promise<string> => {
@@ -95,55 +110,53 @@ function ResultadoContent() {
   }, [user, resultCategoryFromQuery]);
 
   return (
-    <div className="py-10 px-4 sm:px-8 md:py-24 flex flex-col items-center justify-center text-center w-full">
-      <Title />
-      <div className="text-black max-w-3xl flex flex-col gap-6 px-4 sm:px-8">
-        <h3 className="text-lg sm:text-xl font-semibold text-gray-500">
-          O resultado do seu teste é:
-        </h3>
-        <p className="text-base sm:text-lg font-semibold text-justify">
-          &nbsp;O tipo de&nbsp;
-          <span className="text-primary">{resultCategoryFromQuery}.</span>.
-          <span className="italic leading-relaxed">
-            {" "}
-            {resultMessage.split(".").map((sentence, index, array) => {
-              // Adiciona ponto final e quebra de linha a cada terceiro elemento
-              const isThird =
-                (index + 1) % 3 === 0 && index !== array.length - 1;
-              return (
-                <React.Fragment key={index}>
-                  &nbsp;{sentence.trim()}
-                  {sentence && "."}
-                  {isThird && <br />}
-                </React.Fragment>
-              );
-            })}
-          </span>
-        </p>
+    <main className="mx-auto max-w-[1100px] px-4 pb-20 pt-28 sm:px-6 lg:pt-32">
+      <div className="grid gap-12 lg:grid-cols-[1.1fr_0.9fr] lg:gap-16">
+        <div>
+          <Title>Seu resultado</Title>
+          <p className="mt-6 text-lg text-ink-soft">
+            Com base nas suas respostas, seu nível de liderança é:
+          </p>
+          <h2
+            className={`mt-1 text-3xl font-extrabold leading-tight sm:text-4xl ${
+              levelTextColor ?? "text-ink"
+            }`}
+          >
+            {resultCategoryFromQuery || "Liderança não determinada"}
+          </h2>
 
-        <div className="flex justify-center mb-8">
-          <Image
-            className="rounded max-w-full"
-            src={image.src}
-            alt="imagem do resultado"
-            width={500}
-            height={250}
-          />
+          <div className="mt-6 flex max-w-[62ch] flex-col gap-4 text-lg leading-relaxed text-ink-soft">
+            {paragraphs.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
+
+          <div className="mt-10 border-t border-line pt-6">
+            <h3 className="text-xl font-bold">Seu certificado</h3>
+            <p className="mt-1 text-ink-soft">
+              Baixe o resultado em PDF para guardar o seu registro.
+            </p>
+            {error && (
+              <p role="alert" className="mt-3 text-sm text-destructive">
+                {error}
+              </p>
+            )}
+            <div className="mt-4">
+              <CustomButton
+                onClick={handleDownload}
+                disabled={loading}
+                className="px-7 py-3"
+              >
+                {loading ? "Gerando PDF..." : "Baixar certificado em PDF"}
+              </CustomButton>
+            </div>
+          </div>
         </div>
 
-        {error && (
-          <div className="text-red-500 text-sm mt-4">
-            <p>{error}</p>
-          </div>
-        )}
-
-        <small className="text-sm text-gray-600">
-          Clique no botão abaixo para baixar o resultado em PDF:
-        </small>
-        <div className="flex justify-center items-center mt-4">
-          <CustomButton onClick={handleDownload} disabled={loading}>{loading ? "Gerando PDF..." : "Download"}</CustomButton>
+        <div className="lg:pt-10">
+          <Ladder active={activeLevel} />
         </div>
       </div>
-    </div>
+    </main>
   );
 }

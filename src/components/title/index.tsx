@@ -1,8 +1,16 @@
 "use client";
-export function Title() {
+
+type TitleProps = {
+  children?: React.ReactNode;
+  className?: string;
+};
+
+export function Title({ children = "Teste de liderança", className = "" }: TitleProps) {
   return (
-    <h1 className="flex justify-center items-center text-primary text-2xl font-bold mb-10 max-sm: py-10 max-sm:mb-1">
-      Teste de Liderança - PRO Lidera Skills
+    <h1
+      className={`font-display text-3xl font-bold tracking-tight text-ink sm:text-4xl ${className}`}
+    >
+      {children}
     </h1>
   );
 }

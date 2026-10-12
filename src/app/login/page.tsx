@@ -88,93 +88,121 @@ export default function Login() {
   };
   
   return (
-    <div className="flex flex-col md:flex-row min-h-screen">
+    <div className="flex min-h-screen flex-col pt-16 md:flex-row">
       {isLoading ? (
-        <div className="flex flex-col justify-center items-center text-center text-lg font-semibold w-full">
+        <div className="flex w-full flex-col items-center justify-center gap-3 text-center text-lg font-semibold text-ink">
           Enviando... Aguarde.
         </div>
       ) : (
         <>
-          <section className="hidden md:flex w-1/2 relative">
+          <section className="relative hidden w-1/2 md:flex">
             <Image
-              src={image.src}
-              alt="Imagem de Login"
+              src={image}
+              alt=""
               fill
-              className="object-cover bg-no-repeat"
+              sizes="50vw"
+              className="object-cover"
             />
-            <div className="absolute inset-0 bg-[rgba(0,0,0,0.65)]"></div>
+            <div className="absolute inset-0 bg-ink/75"></div>
+            <p className="relative z-10 mt-auto max-w-[14ch] p-12 font-display text-5xl font-extrabold leading-[1.05] text-white lg:p-16">
+              Seu próximo degrau começa aqui.
+            </p>
           </section>
-          <section className="w-full md:w-1/2 flex flex-col items-center justify-center p-6 sm:p-8 md:p-12 lg:p-16">
-            <div className="flex flex-col items-center gap-5 w-full max-w-md">
-              <h1 className="font-bold text-primary text-lg md:text-xl">
-                FAZER LOGIN
-              </h1>
+          <section className="flex w-full flex-col items-center justify-center px-4 py-12 sm:px-8 md:w-1/2 md:px-12 lg:px-16">
+            <form
+              className="flex w-full max-w-md flex-col gap-5"
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmit();
+              }}
+              noValidate
+            >
+              <div>
+                <h1 className="text-3xl font-bold sm:text-4xl">Entrar</h1>
+                <p className="mt-2 text-ink-soft">
+                  Acesse sua conta para fazer o teste de liderança.
+                </p>
+              </div>
 
-              {/* Campo de E-mail */}
-              <label htmlFor="email" className="text-sm font-medium">
-                E-mail
-              </label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Digite seu e-mail"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className={`border w-full ${errors.email ? "border-red-500" : "border-black"}`}
-                required
-              />
-              {errors.email && <p className="text-red-500">{errors.email}</p>}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="email" className="text-sm font-semibold text-ink">
+                  E-mail
+                </label>
+                <Input
+                  id="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="voce@exemplo.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? "email-error" : undefined}
+                  required
+                />
+                {errors.email && (
+                  <p id="email-error" role="alert" className="text-sm text-destructive">
+                    {errors.email}
+                  </p>
+                )}
+              </div>
 
-              {/* Campo de Senha */}
-              <label htmlFor="password" className="text-sm font-medium">
-                Senha
-              </label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Digite sua senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={`border w-full ${errors.password ? "border-red-500" : "border-black"}`}
-                required
-              />
-              {errors.password && <p className="text-red-500">{errors.password}</p>}
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="password" className="text-sm font-semibold text-ink">
+                  Senha
+                </label>
+                <Input
+                  id="password"
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder="Digite sua senha"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? "password-error" : undefined}
+                  required
+                />
+                {errors.password && (
+                  <p id="password-error" role="alert" className="text-sm text-destructive">
+                    {errors.password}
+                  </p>
+                )}
+                <div className="text-right">
+                  <span className="cursor-pointer text-sm text-ink-soft underline underline-offset-2 hover:text-primary">
+                    Esqueceu a senha?
+                  </span>
+                </div>
+              </div>
 
-              {/* Botão de Login */}
-              <CustomButton
-                className="w-full flex items-center justify-center gap-x-3 shadow-lg"
-                onClick={handleSubmit}
-              >
+              <CustomButton type="submit" className="w-full py-3">
                 Entrar
               </CustomButton>
 
-              {/* Links e Separador */}
-              <div className="w-full text-right">
-                <span className="text-textColor underline opacity-70 cursor-pointer">
-                  Esqueceu a senha?
-                </span>
+              <div className="flex items-center gap-4 text-sm text-ink-muted">
+                <Separator className="flex-1 bg-line" />
+                ou acesse com
+                <Separator className="flex-1 bg-line" />
               </div>
-              <Separator className="border border-primary my-4" />
 
-              {/* Login com Redes Sociais */}
-              <h2 className="text-textColor">Quero acessar com minhas redes sociais</h2>
-              <CustomButton
-                className="w-full flex items-center justify-center gap-x-3 shadow-lg bg-opacity-60"
-                onClick={handleLoginGoogle}
-              >
-                <FcGoogle /> Google
-              </CustomButton>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <CustomButton
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleLoginGoogle}
+                >
+                  <FcGoogle className="text-lg" aria-hidden /> Google
+                </CustomButton>
+              </div>
 
-              {/* Cadastro */}
-              <div className="flex flex-col items-center gap-2 md:flex-row md:justify-center md:gap-3">
-                <h2 className="text-textColor text-center">Novo no PRO Lidera Skills?</h2>
-                <Link href={"/cadastro"}>
-                  <CustomButton className="text-primary bg-transparent hover:text-white lg:w-40 max-sm:text-sm">
-                    CADASTRE-SE
-                  </CustomButton>
+              <p className="text-center text-ink-soft">
+                Novo no PRO Lidera Skills?{" "}
+                <Link
+                  href="/cadastro"
+                  className="font-semibold text-primary underline underline-offset-2 hover:text-primary-hover"
+                >
+                  Cadastre-se
                 </Link>
-              </div>
-            </div>
+              </p>
+            </form>
           </section>
         </>
       )}

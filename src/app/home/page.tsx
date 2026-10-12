@@ -1,98 +1,143 @@
-import { ArrowDown, ArrowRight, Compass, Target, TrendingUp } from "lucide-react";
-import Link from "next/link";
+"use client";
+import { CustomButton } from "@/components/button/custom-button";
+import { Ladder } from "@/components/ladder";
+import image from "@/assets/images/main-image.png";
 import Image from "next/image";
-import illustration from "@/assets/images/rb_76463.png";
+import data from "@/lib/data.json";
+import { useSession } from "../../../contexts/user-context";
+
+const steps = [
+  {
+    title: "Crie sua conta",
+    text: "Cadastre-se com e-mail e senha ou entre com sua conta Google.",
+  },
+  {
+    title: "Responda 18 perguntas",
+    text: "São seis temas, com três perguntas cada. Se você sair, o teste continua de onde parou.",
+  },
+  {
+    title: "Veja seu nível e baixe o certificado",
+    text: "Você recebe uma análise do seu desempenho e um certificado em PDF.",
+  },
+];
 
 export default function HomePage() {
-  return (
-    <main className="bg-[#f5f4ed] text-[#172b2a]">
-      <section className="relative isolate flex min-h-[calc(100svh-12rem)] items-center overflow-hidden bg-[#103c38] px-6 pb-8 pt-16 text-white sm:px-10 sm:pb-16 sm:pt-24 lg:px-16 lg:pb-20 lg:pt-20">
-        <div className="absolute inset-0 -z-10 opacity-[0.09] [background-image:linear-gradient(rgba(255,255,255,0.35)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.35)_1px,transparent_1px)] [background-size:48px_48px]" />
-        <div className="mx-auto grid w-full max-w-7xl items-center gap-6 sm:gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-12">
-          <div className="relative z-10 max-w-2xl py-2 sm:py-4">
-            <p className="mb-5 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.18em] text-[#f6b84b] sm:text-sm">
-              <span className="h-px w-8 bg-[#f6b84b]" />
-              PRO Lidera Skills
-            </p>
-            <h1 className="max-w-[12ch] text-4xl font-bold leading-[1.08] sm:text-5xl lg:text-6xl">
-              Liderar começa por <span className="text-[#f6b84b]">se conhecer.</span>
-            </h1>
-            <p className="mt-4 max-w-xl text-base leading-7 text-[#d6e5df] sm:mt-6 sm:text-lg sm:leading-8">
-              Descubra suas habilidades, reconheça seus pontos fortes e encontre
-              caminhos práticos para crescer como líder.
-            </p>
-            <div className="mt-6 flex flex-col gap-2 sm:mt-8 sm:flex-row sm:items-center sm:gap-3">
-              <Link
-                href="/cadastro"
-                className="inline-flex min-h-12 items-center justify-center gap-3 bg-[#f6b84b] px-6 py-3 font-bold text-[#172b2a] transition-colors hover:bg-[#ffd27c] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-              >
-                Começar avaliação <ArrowRight size={18} aria-hidden="true" />
-              </Link>
-              <Link
-                href="/login"
-                className="inline-flex min-h-12 items-center justify-center px-6 py-3 font-semibold text-white underline decoration-white/40 underline-offset-4 transition-colors hover:decoration-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-              >
-                Já tenho uma conta
-              </Link>
-            </div>
-            <p className="mt-4 text-sm text-[#d6e5df] sm:mt-7">
-              Uma jornada de autoconhecimento, no seu ritmo.
-            </p>
-          </div>
+  const { user } = useSession();
 
-          <div className="relative mx-auto flex w-full max-w-[200px] items-center justify-center sm:max-w-xl lg:justify-end">
-            <div className="absolute bottom-[12%] left-[8%] h-20 w-20 border border-[#f6b84b]/70 sm:h-28 sm:w-28" />
-            <Image
-              src={illustration}
-              alt="Duas pessoas analisam juntas uma avaliação de habilidades"
-              priority
-              className="relative z-10 h-auto w-full max-w-[200px] drop-shadow-[0_24px_30px_rgba(0,0,0,0.18)] sm:max-w-[380px] lg:max-w-[440px]"
-              sizes="(max-width: 768px) 82vw, 440px"
-            />
-            <div className="absolute right-0 top-[10%] hidden h-14 w-14 border-r-2 border-t-2 border-[#f6b84b] sm:block" />
+  return (
+    <main>
+      <section className="mx-auto grid max-w-[1240px] items-end gap-12 px-4 pb-16 pt-28 sm:px-6 lg:grid-cols-[1fr_1.15fr] lg:gap-16 lg:pb-24 lg:pt-32">
+        <div className="flex flex-col items-start gap-6 lg:pb-6">
+          <h1 className="max-w-[16ch] text-[2.25rem] font-extrabold leading-[1.04] sm:text-6xl lg:text-7xl">
+            Descubra em que degrau da liderança você está
+          </h1>
+          <p className="max-w-[46ch] text-lg leading-relaxed text-ink-soft sm:text-xl">
+            Responda 18 perguntas sobre comunicação, decisão e inteligência
+            emocional e receba seu nível de liderança, com uma análise do seu
+            desempenho.
+          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-3">
+            {user ? (
+              <CustomButton href="/instrucoes" className="px-7 py-3 text-base">
+                Fazer o teste
+              </CustomButton>
+            ) : (
+              <>
+                <CustomButton href="/cadastro" className="px-7 py-3 text-base">
+                  Criar conta
+                </CustomButton>
+                <CustomButton
+                  href="/login"
+                  variant="outline"
+                  className="px-7 py-3 text-base"
+                >
+                  Entrar
+                </CustomButton>
+              </>
+            )}
           </div>
         </div>
-        <a
-          href="#about-us"
-          aria-label="Conheça a plataforma"
-          className="absolute bottom-5 left-1/2 hidden -translate-x-1/2 text-white/75 transition-colors hover:text-white sm:block"
-        >
-          <ArrowDown size={20} aria-hidden="true" />
-        </a>
+
+        <Ladder animated />
       </section>
 
-      <section id="about-us" className="px-6 py-16 sm:px-10 sm:py-20 lg:px-16">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid gap-4 border-b border-[#172b2a]/20 pb-8 md:grid-cols-[0.8fr_1.2fr] md:items-end md:gap-12">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#23766b] sm:text-sm">
-              Autoconhecimento em movimento
-            </p>
-            <h2 className="max-w-2xl text-3xl font-bold leading-tight sm:text-4xl">
-              Mais clareza para liderar do seu jeito.
+      <section
+        aria-labelledby="como-funciona"
+        className="border-y border-line bg-white"
+      >
+        <div className="mx-auto max-w-[1240px] px-4 py-16 sm:px-6 lg:py-20">
+          <h2 id="como-funciona" className="max-w-[22ch] text-3xl font-bold sm:text-4xl">
+            Do cadastro ao certificado em três passos
+          </h2>
+          <ol className="mt-10 grid gap-8 md:grid-cols-3 md:gap-10">
+            {steps.map((step, index) => (
+              <li key={step.title} className="flex flex-col gap-3 border-t-2 border-ink pt-5">
+                <span className="font-display text-4xl font-extrabold text-primary">
+                  {index + 1}
+                </span>
+                <h3 className="text-xl font-bold">{step.title}</h3>
+                <p className="max-w-[38ch] text-ink-soft">{step.text}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      <section
+        aria-labelledby="o-que-avalia"
+        className="mx-auto max-w-[1240px] px-4 py-16 sm:px-6 lg:py-20"
+      >
+        <div className="grid gap-10 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
+          <div>
+            <h2 id="o-que-avalia" className="max-w-[16ch] text-3xl font-bold sm:text-4xl">
+              O que o teste avalia
             </h2>
+            <p className="mt-4 max-w-[40ch] text-ink-soft">
+              Cada tema reúne três situações do dia a dia de quem lidera. Você
+              escolhe a atitude que mais combina com a sua.
+            </p>
           </div>
-          <div className="grid gap-8 pt-8 sm:grid-cols-3 sm:gap-10">
-            <article className="border-t-2 border-[#23766b] pt-5">
-              <Compass className="mb-5 text-[#23766b]" size={25} strokeWidth={1.8} aria-hidden="true" />
-              <h3 className="text-xl font-bold">Entenda seu perfil</h3>
-              <p className="mt-3 max-w-sm leading-7 text-[#52615d]">
-                Veja como suas atitudes e competências aparecem na sua forma de liderar.
-              </p>
-            </article>
-            <article className="border-t-2 border-[#e98742] pt-5">
-              <Target className="mb-5 text-[#c5662c]" size={25} strokeWidth={1.8} aria-hidden="true" />
-              <h3 className="text-xl font-bold">Reconheça prioridades</h3>
-              <p className="mt-3 max-w-sm leading-7 text-[#52615d]">
-                Identifique pontos fortes e oportunidades para orientar seus próximos passos.
-              </p>
-            </article>
-            <article className="border-t-2 border-[#d6aa35] pt-5">
-              <TrendingUp className="mb-5 text-[#a47c13]" size={25} strokeWidth={1.8} aria-hidden="true" />
-              <h3 className="text-xl font-bold">Evolua continuamente</h3>
-              <p className="mt-3 max-w-sm leading-7 text-[#52615d]">
-                Transforme percepções em ações concretas para desenvolver sua liderança.
-              </p>
-            </article>
+          <ul className="grid gap-x-10 sm:grid-cols-2">
+            {data.map((item) => (
+              <li
+                key={item.theme}
+                className="flex items-baseline justify-between gap-4 border-b border-line py-4"
+              >
+                <span className="font-display text-lg font-semibold">{item.theme}</span>
+                <span className="shrink-0 text-sm text-ink-muted">
+                  {item.questions.length} perguntas
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+
+      <section
+        id="about-us"
+        aria-labelledby="quem-somos"
+        className="mx-auto max-w-[1240px] px-4 pb-20 sm:px-6 lg:pb-28"
+      >
+        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+          <div className="relative aspect-[4/3] overflow-hidden rounded-2xl">
+            <Image
+              src={image}
+              alt="Mãos de uma equipe reunidas no centro de uma mesa de trabalho"
+              fill
+              sizes="(min-width: 1024px) 600px, 100vw"
+              className="object-cover"
+            />
+          </div>
+          <div>
+            <h2 id="quem-somos" className="max-w-[18ch] text-3xl font-bold sm:text-4xl">
+              Quem somos
+            </h2>
+            <p className="mt-5 max-w-[52ch] text-lg leading-relaxed text-ink-soft">
+              A PRO Lidera Skills é uma aplicação que avalia suas capacidades
+              de liderança. Nossa missão é ajudar você a compreender suas
+              habilidades para alcançar todo o seu potencial. Com uma abordagem
+              personalizada, buscamos promover o desenvolvimento contínuo.
+            </p>
           </div>
         </div>
       </section>

@@ -2,43 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  @font-face {
-    font-family: "Baloo Paaji 2";
-    font-style: normal;
-    font-weight: 100-900; 
-    font-display: optional;
-    src: url("./fonts/BalooPaaji2-VariableFont_wght.ttf") format("truetype");
-  }
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 :root {
-  --background: #d9d9d9;
-  --foreground: #231f1f;
-  --primary-color: #3590b5;
-  --text-color: #4d4d4d;
-  --shadow-color: rgba(0, 0, 0, 0.25);
+  --background: #f4f8f6;
+  --foreground: #12303f;
+  --primary-color: #1f6f8b;
+  --text-color: #3d5a68;
+  --shadow-color: rgba(18, 48, 63, 0.18);
   --background-color: #ffffff;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --background: #d9d9d9;
-    --foreground: #231f1f;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem; /* altura do header fixo */
+    -webkit-text-size-adjust: 100%;
   }
-}
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: "Baloo Paaji 2", sans-serif;
-  height: 100vh;
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+    min-height: 100vh;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display tracking-tight;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: #88c16c66;
+  }
+
+  :focus-visible {
+    outline: 2px solid #1f6f8b;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
 
 @layer utilities {
