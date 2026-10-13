@@ -1,65 +1,109 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { CustomButton } from '@/components/button/custom-button';
 import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { Checkbox } from '@/components/ui/checkbox';
 import { FcGoogle } from 'react-icons/fc';
 import { FormEvent } from 'react';
 import Image from 'next/image';
 import image from '@/assets/images/sign.jpg';
 import { supabase } from "@/lib/supabaseClient";
 
+const MIN_PASSWORD_LENGTH = 6;
+
+function traduzErro(message: string) {
+  const m = message.toLowerCase();
+  if (m.includes("already registered")) return "Este e-mail já está cadastrado. Tente entrar na sua conta.";
+  if (m.includes("password")) return `A senha deve ter pelo menos ${MIN_PASSWORD_LENGTH} caracteres.`;
+  if (m.includes("rate limit")) return "Muitas tentativas. Aguarde um pouco e tente novamente.";
+  if (m.includes("invalid") && m.includes("email")) return "E-mail inválido.";
+  return message;
+}
+
 export default function Cadastro() {
-  // Adiciona o estado para capturar os valores dos campos
+  const router = useRouter();
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
   const [error, setError] = useState('');
-
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
+
+    if (senha.length < MIN_PASSWORD_LENGTH) {
+      setError(`A senha deve ter pelo menos ${MIN_PASSWORD_LENGTH} caracteres.`);
+      return;
+    }
 
     if (senha !== confirmarSenha) {
       setError("As senhas não coincidem.");
       return;
     }
 
+    setIsLoading(true);
+
     try {
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: email.trim(),
         password: senha,
         options: {
           data: {
-            name: nome,
-            full_name: nome,
+            name: nome.trim(),
+            full_name: nome.trim(),
           },
-          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        setError(traduzErro(error.message));
+        return;
+      }
+
+      // Se o Supabase ainda exigir confirmação de e-mail, não vem sessão.
+      if (!data.session) {
+        setError(
+          "Cadastro criado, mas é preciso confirmar o e-mail antes de entrar. Verifique sua caixa de entrada."
+        );
+        return;
+      }
+
+      // Usuário criado e salvo no Supabase. Encerra a sessão automática
+      // e leva para o login.
+      await supabase.auth.signOut();
+      router.push("/login");
+    } catch (err) {
+      console.error("Erro ao cadastrar usuário:", err);
+      setError("Não foi possível realizar o cadastro. Tente novamente.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCadastroGoogle = async () => {
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/instrucoes`,
         },
       });
 
       if (error) {
         setError(error.message);
-        return;
+        setIsLoading(false);
       }
-
-      if (data.user && data.session === null) {
-        alert(
-          "Cadastro realizado! Verifique seu e-mail e confirme sua conta antes de entrar."
-        );
-        return;
-      }
-
-      alert(
-        "Cadastro realizado. Verifique seu e-mail para confirmar sua conta."
-      );
-    } catch (error) {
-      console.error("Erro ao cadastrar usuário:", error);
-      setError("Não foi possível realizar o cadastro. Tente novamente.");
+    } catch (err) {
+      console.error("Erro ao cadastrar com Google:", err);
+      setError("Não foi possível continuar com o Google. Tente novamente.");
+      setIsLoading(false);
     }
   };
 
@@ -75,7 +119,12 @@ export default function Cadastro() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <CustomButton variant="outline" className="w-full" onClick={() => { }}>
+            <CustomButton
+              variant="outline"
+              className="w-full"
+              onClick={handleCadastroGoogle}
+              disabled={isLoading}
+            >
               <FcGoogle className="text-lg" aria-hidden />
               Google
             </CustomButton>
@@ -123,6 +172,7 @@ export default function Cadastro() {
                 id="senha"
                 type="password"
                 autoComplete="new-password"
+                minLength={MIN_PASSWORD_LENGTH}
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
                 required
@@ -154,26 +204,8 @@ export default function Cadastro() {
             )}
           </div>
 
-          <div className="flex flex-col gap-3">
-            <div className="flex items-start gap-3">
-              <Checkbox id="aceita-ofertas" className="mt-0.5" />
-              <label htmlFor="aceita-ofertas" className="cursor-pointer text-sm leading-snug text-ink-soft">
-                Quero receber ofertas e novidades por e-mail, SMS, WhatsApp ou
-                mensagens.*
-              </label>
-            </div>
-            <div className="flex items-start gap-3">
-              <Checkbox id="aceita-politicas" className="mt-0.5" />
-              <label htmlFor="aceita-politicas" className="cursor-pointer text-sm leading-snug text-ink-soft">
-                Li e estou de acordo com as políticas da empresa e a política
-                de privacidade.*
-              </label>
-            </div>
-            <span className="text-sm text-ink-muted">(*) Campos obrigatórios</span>
-          </div>
-
-          <CustomButton href="/login" className="w-full py-3">
-            Cadastrar
+          <CustomButton type="submit" className="w-full py-3" disabled={isLoading}>
+            {isLoading ? "Cadastrando..." : "Cadastrar"}
           </CustomButton>
 
           <p className="text-center text-ink-soft">
