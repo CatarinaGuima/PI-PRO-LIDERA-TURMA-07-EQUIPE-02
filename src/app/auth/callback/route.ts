@@ -1,22 +1,27 @@
-import { supabase } from "@/lib/supabaseClient";
+
+import { createSupabaseServerClient } from "@/lib/supabaseServer";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
-  const { searchParams, origin } = new URL(request.url);
-  const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/";
+  const requestUrl = new URL(request.url);
+  const code = requestUrl.searchParams.get("code");
 
-  if (code) {
-    const { error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
-      const forwardedHost = request.headers.get("x-forwarded-host");
-      const isLocalEnv = process.env.NODE_ENV === "development";
-      const redirectUrl = isLocalEnv
-        ? `${origin}${next}`
-        : `https://${forwardedHost || origin}${next}`;
-      return NextResponse.redirect(redirectUrl);
-    }
+  if (!code) {
+    return NextResponse.redirect(
+      new URL("/login?error=confirmation", requestUrl.origin)
+    );
   }
 
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+  const supabase = await createSupabaseServerClient();
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+  if (error) {
+    console.error("Erro ao confirmar sessão:", error.message);
+
+    return NextResponse.redirect(
+      new URL("/login?error=confirmation", requestUrl.origin)
+    );
+  }
+
+  return NextResponse.redirect(new URL("/instrucoes", requestUrl.origin));
 }

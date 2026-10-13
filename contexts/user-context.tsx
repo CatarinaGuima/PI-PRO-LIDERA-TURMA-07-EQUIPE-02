@@ -1,12 +1,14 @@
-"use client";
+'use client';
 
-import { createContext, ReactNode, useContext, useState, useEffect } from "react";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import {
+    createContext,
+    ReactNode,
+    useContext,
+    useEffect,
+    useState,
+} from 'react';
+import { supabase } from '@/lib/supabaseClient';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 interface UserContextType {
     id: string | null;
@@ -16,69 +18,72 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | null>(null);
 
+function getUserData(user: SupabaseUser | null) {
+    if (!user) {
+        return {
+            id: null,
+            user: null,
+            avatarUrl: null,
+        };
+    }
+
+    const name =
+        user.user_metadata?.name ||
+        user.user_metadata?.full_name ||
+        user.email ||
+        'Usuário';
+
+    return {
+        id: user.id,
+        user: { name },
+        avatarUrl: user.user_metadata?.avatar_url ?? null,
+    };
+}
+
 export function UserProvider({ children }: { children: ReactNode }) {
     const [id, setId] = useState<string | null>(null);
     const [user, setUser] = useState<{ name: string } | null>(null);
     const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
     useEffect(() => {
-        const storedId = localStorage.getItem("id");
-        const storedUser = JSON.parse(localStorage.getItem("user") || "null");
-        const storedAvatarUrl = localStorage.getItem("avatarUrl");
+        let mounted = true;
 
-        if (storedId && storedUser && storedAvatarUrl) {
-            setId(storedId);
-            setUser(storedUser);
-            setAvatarUrl(storedAvatarUrl);
-        } else {
-            const fetchUser = async () => {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (user) {
-                    const userId = user.id;
-                    const userData = { name: user.user_metadata.name };
-                    const avatar = user.user_metadata.avatar_url || null;
+        const syncUser = (supabaseUser: SupabaseUser | null) => {
+            if (!mounted) return;
 
-                    setId(userId);
-                    setUser(userData);
-                    setAvatarUrl(avatar);
+            const userData = getUserData(supabaseUser);
 
-                    // Armazenar no localStorage
-                    localStorage.setItem("id", userId);
-                    localStorage.setItem("user", JSON.stringify(userData));
-                    if (avatar) localStorage.setItem("avatarUrl", avatar);
-                }
-            };
+            setId(userData.id);
+            setUser(userData.user);
+            setAvatarUrl(userData.avatarUrl);
+        };
 
-            fetchUser();
-        }
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((_event, session) => {
+            syncUser(session?.user ?? null);
+        });
 
-        const { data: subscription } = supabase.auth.onAuthStateChange(
-            (_, session) => {
-                if (session?.user) {
-                    const userId = session.user.id;
-                    const userData = { name: session.user.user_metadata.name };
-                    const avatar = session.user.user_metadata.avatar_url || null;
+        const loadSession = async () => {
+            const {
+                data: { session },
+                error,
+            } = await supabase.auth.getSession();
 
-                    setId(userId);
-                    setUser(userData);
-                    setAvatarUrl(avatar);
-
-                    // Atualizar no localStorage
-                    localStorage.setItem("id", userId);
-                    localStorage.setItem("user", JSON.stringify(userData));
-                    if (avatar) localStorage.setItem("avatarUrl", avatar);
-                } else {
-                    setId(null);
-                    setUser(null);
-                    setAvatarUrl(null);
-                    localStorage.removeItem("id");
-                    localStorage.removeItem("user");
-                    localStorage.removeItem("avatarUrl");
-                }
+            if (error) {
+                console.error('Erro ao recuperar sessão:', error.message);
+                return;
             }
-        );
 
-        return () => subscription.subscription.unsubscribe();
+            syncUser(session?.user ?? null);
+        };
+
+        void loadSession();
+
+        return () => {
+            mounted = false;
+            subscription.unsubscribe();
+        };
     }, []);
 
     return (
@@ -90,8 +95,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
 export function useSession() {
     const context = useContext(UserContext);
+
     if (!context) {
-        throw new Error("useSession deve ser usado dentro de UserProvider");
+        throw new Error('useSession deve ser usado dentro de UserProvider');
     }
+
     return context;
 }

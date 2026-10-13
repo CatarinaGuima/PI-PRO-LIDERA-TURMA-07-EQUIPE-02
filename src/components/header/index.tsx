@@ -3,8 +3,6 @@ import React, { useState } from "react";
 import Image from "next/image";
 import logo from "../../../src/assets/images/logo.png";
 import { RxHamburgerMenu, RxCross2 } from "react-icons/rx";
-import { Switch } from "../ui/switch";
-import { TbAccessible } from "react-icons/tb";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { DropdownMenuDemo } from "../menu";
 import { useSession } from "../../../contexts/user-context";
@@ -14,7 +12,6 @@ const navLink =
   "rounded-lg px-3 py-2 text-[0.95rem] font-medium text-ink-soft transition-colors hover:bg-primary/10 hover:text-primary";
 
 export function Header() {
-  const [isActive, setIsActive] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, avatarUrl } = useSession();
 
@@ -75,21 +72,6 @@ export function Header() {
               </li>
             </>
           )}
-
-          <li className="flex items-center gap-2 max-sm:px-3 max-sm:py-2 sm:ml-3 sm:border-l sm:border-line sm:pl-4">
-            <Switch
-              id="accessibility-mode"
-              aria-label="Acessibilidade"
-              onClick={() => setIsActive(!isActive)}
-            />
-            <label
-              htmlFor="accessibility-mode"
-              className="flex cursor-pointer items-center gap-1 text-sm font-semibold text-ink-soft"
-            >
-              Acessibilidade
-              <TbAccessible aria-hidden className="text-lg" />
-            </label>
-          </li>
         </ul>
 
         <button

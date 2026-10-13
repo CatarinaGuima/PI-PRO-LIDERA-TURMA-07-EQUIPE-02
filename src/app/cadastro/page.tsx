@@ -9,6 +9,7 @@ import { FcGoogle } from 'react-icons/fc';
 import { FormEvent } from 'react';
 import Image from 'next/image';
 import image from '@/assets/images/sign.jpg';
+import { supabase } from "@/lib/supabaseClient";
 
 export default function Cadastro() {
   // Adiciona o estado para capturar os valores dos campos
@@ -18,33 +19,47 @@ export default function Cadastro() {
   const [confirmarSenha, setConfirmarSenha] = useState('');
   const [error, setError] = useState('');
 
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Validação simples de senha
+    setError("");
+
     if (senha !== confirmarSenha) {
-      setError('As senhas não coincidem.');
+      setError("As senhas não coincidem.");
       return;
     }
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password: senha,
+        options: {
+          data: {
+            name: nome,
+            full_name: nome,
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
-        body: JSON.stringify({ nome, email, senha }),
       });
 
-      const data = await response.json();
-      if (response.ok) {
-        alert('Cadastro realizado com sucesso!');
-        // Redirecionar ou limpar campos conforme necessário
-      } else {
-        setError(data.message || 'Erro ao cadastrar usuário.');
+      if (error) {
+        setError(error.message);
+        return;
       }
+
+      if (data.user && data.session === null) {
+        alert(
+          "Cadastro realizado! Verifique seu e-mail e confirme sua conta antes de entrar."
+        );
+        return;
+      }
+
+      alert(
+        "Cadastro realizado. Verifique seu e-mail para confirmar sua conta."
+      );
     } catch (error) {
-      console.error('Erro ao fazer a solicitação:', error);
-      setError('Erro ao se conectar com o servidor.');
+      console.error("Erro ao cadastrar usuário:", error);
+      setError("Não foi possível realizar o cadastro. Tente novamente.");
     }
   };
 
@@ -59,8 +74,8 @@ export default function Cadastro() {
             </p>
           </div>
 
-          <div className="grid gap-3 sm:grid-cols-2">
-            <CustomButton variant="outline" className="w-full" onClick={() => {}}>
+          <div className="flex flex-col gap-3">
+            <CustomButton variant="outline" className="w-full" onClick={() => { }}>
               <FcGoogle className="text-lg" aria-hidden />
               Google
             </CustomButton>

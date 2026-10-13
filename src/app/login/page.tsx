@@ -8,8 +8,10 @@ import Link from "next/link";
 import { FcGoogle } from "react-icons/fc";
 import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/lib/supabaseClient";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({ email: "", password: "" });
@@ -47,7 +49,7 @@ export default function Login() {
     if (validateForm()) {
       setIsLoading(true);
       try {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
@@ -55,7 +57,7 @@ export default function Login() {
         if (error) {
           setErrors({ ...errors, email: error.message });
         } else {
-          console.log("Usuário logado:", data);
+          router.push("/instrucoes");
         }
       } catch (err) {
         console.error("Erro ao tentar fazer login:", err);
@@ -86,7 +88,7 @@ export default function Login() {
       setIsLoading(false);
     }
   };
-  
+
   return (
     <div className="flex min-h-screen flex-col pt-16 md:flex-row">
       {isLoading ? (
@@ -183,7 +185,7 @@ export default function Login() {
                 <Separator className="flex-1 bg-line" />
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="flex flex-col gap-3">
                 <CustomButton
                   variant="outline"
                   className="w-full"
