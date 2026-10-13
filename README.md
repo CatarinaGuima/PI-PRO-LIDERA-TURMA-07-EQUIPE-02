@@ -68,7 +68,7 @@ O resultado pode ser **baixado em PDF**, permitindo manter um registro da avalia
 ## 📸 Screenshot
 
 <div align="center">
-  <img src="https://github.com/user-attachments/assets/dbe7b22d-6dd6-4de4-81e6-449ac1a8dfe9" alt="Screenshot da aplicação PRO Lidera Skills" width="800" />
+  <img width="1896" height="936" alt="image" src="https://github.com/user-attachments/assets/e1a16e93-d2ca-47f6-a49f-fc4f75abf79b" />
 </div>
 
 ## 🛠️ Tecnologias
